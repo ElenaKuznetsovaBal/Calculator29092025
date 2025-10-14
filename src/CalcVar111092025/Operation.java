@@ -1,6 +1,59 @@
 package CalcVar211092025;
 
-abstract class Operation {
+// Принцип ISP: разделенные интерфейсы
+interface IOperation {
+    int execute(int a, int b);
+}
+// Принцип DIP: абстракция для фабрики
+interface IOperationFactory {
+    IOperation createOperation(String operator);
+}
+// Базовый класс для операций
+abstract class BinaryOperation implements IOperation {
+    @Override
+    public abstract int execute(int a, int b);
+}
+
+// Конкретные операции
+class Addition extends BinaryOperation {
+    @Override
+    public int execute(int a, int b) { return a + b; }
+}
+
+class Subtraction extends BinaryOperation {
+    @Override
+    public int execute(int a, int b) { return a - b; }
+}
+
+class Multiplication extends BinaryOperation {
+    @Override
+    public int execute(int a, int b) { return a * b; }
+}
+
+class Division extends BinaryOperation {
+    @Override
+    public int execute(int a, int b) {
+        if (b == 0) throw new ArithmeticException("деление на 0");
+        return a / b;
+    }
+}
+
+class Power extends BinaryOperation {
+    @Override
+    public int execute(int a, int b) {
+        if (b < 0) throw new ArithmeticException("отрицательная степень не поддерживается");
+        return (int) Math.pow(a, b);
+    }
+}
+
+class Modulus extends BinaryOperation {
+    @Override
+    public int execute(int a, int b) {
+        if (b == 0) throw new ArithmeticException("остаток от деления на 0");
+        return a % b;
+    }
+}
+/*abstract class Operation {
     protected int operand1;
     protected int operand2;
 
@@ -59,3 +112,4 @@ class Modulus extends Operation {
         return operand1 % operand2;
     }
 }
+*/
