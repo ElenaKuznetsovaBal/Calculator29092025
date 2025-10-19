@@ -7,96 +7,59 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         Calculator calculator = new Calculator();
 
-        System.out.println("КОНСОЛЬНЫЙ КАЛЬКУЛЯТОР");
-        System.out.println("Поддерживаемые операции: + (сложение), - (вычитание), * (умножение), / (деление), // (целочисленное деление), ^ (степень), % (остаток)");
+        System.out.println("КАЛЬКУЛЯТОР С ОБРАБОТКОЙ ОШИБОК");
+        System.out.println("Поддерживаемые операции: +, -, *, /, //, ^, %");
         System.out.println("Для выхода введите 'exit'");
 
-        // Основной цикл работы калькулятора
         while (true) {
-            System.out.print("Введите выражение разделитель пробел: ");
-            String input = scanner.nextLine().trim();
-
-            // Проверка на выход из программы
-            if ("exit".equalsIgnoreCase(input)) {
-                System.out.println("Выход...");
-                break;
-            }
-
-            // Проверка корректности выражения
-            if (!isValidExpression(input)) {
-                System.out.println("Неверное выражение. Введите еще раз:");
-                continue;
-            }
-
             try {
-                // Вычисление результата
-                int result = calculateExpression(input, calculator);
+                System.out.print("\nВведите выражение (число - оператор - число): ");
+                String input = scanner.nextLine().trim();
+
+                // Выход
+                if (input.equalsIgnoreCase("exit")) {
+                    System.out.println("Завершение работы программы.");
+                    break;
+                }
+
+                // Пустой ввод
+                if (input.isEmpty()) {
+                    System.out.println("Ошибка: Пустой ввод.");
+                    continue;
+                }
+
+                // Разбиваем на части
+                String[] parts = input.split("\\s+");
+
+                // Проверка формата
+                if (parts.length != 3) {
+                    System.out.println("Ошибка: Неверный формат. Используйте: число - оператор - число");
+                    System.out.println("Пример: 10 + 5");
+                    continue;
+                }
+
+                // Парсим числа
+                int a = Integer.parseInt(parts[0]);
+                int b = Integer.parseInt(parts[2]);
+                String operator = parts[1];
+
+                // Выполняем операцию через метод calculate
+                int result = calculator.calculate(a, operator, b);
                 System.out.println("Результат: " + result);
+
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: Неверный формат числа. Введите целые числа.");
             } catch (ArithmeticException e) {
-                System.out.println("Ошибка - " + e.getMessage());
+                System.out.println("Математическая ошибка: " + e.getMessage());
+            } catch (IllegalArgumentException e) {
+                System.out.println("Ошибка операции: " + e.getMessage());
             } catch (Exception e) {
-                System.out.println("Произошла ошибка: " + e.getMessage());
+                System.out.println("Неожиданная ошибка: " + e.getMessage());
             }
         }
+
         scanner.close();
     }
-
-    /*
-     Проверяет корректность математического выражения
-     expression - введенное выражение. return = true если выражение корректно, иначе = false
-     */
-    private static boolean isValidExpression(String expression) {
-        if (expression == null || expression.isEmpty()) {
-            return false;
-        }
-
-        // Разбиваем выражение на части по пробелам
-        String[] parts = expression.split("\\s+");
-
-        // Проверяем что выражение состоит из трех части
-        if (parts.length != 3) {
-            return false;
-        }
-
-        // Проверяем что первая и третья части - целые числа
-        try {
-            Integer.parseInt(parts[0]);
-            Integer.parseInt(parts[2]);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-
-        // Проверяем что оператор поддерживается
-        String operator = parts[1];
-        return operator.equals("+") || operator.equals("-") ||
-                operator.equals("*") || operator.equals("/") ||
-                operator.equals("//") || operator.equals("^") ||
-                operator.equals("%");
-    }
-
-    /*
-     Вычисляет результат математического выражения
-     expression - строка с выражением
-     return результат вычисления
-     throws ArithmeticException при арифметических ошибках
-     */
-    private static int calculateExpression(String expression, Calculator calculator) {
-        String[] parts = expression.split("\\s+");
-        int a = Integer.parseInt(parts[0]);
-        String operator = parts[1];
-        int b = Integer.parseInt(parts[2]);
-
-        // Выбор операции в зависимости от оператора
-        switch (operator) {
-            case "+": return calculator.sum(a, b);
-            case "-": return calculator.sub(a, b);
-            case "*": return calculator.multiply(a, b);
-            case "/": return calculator.div(a, b);
-            case "//": return calculator.integdiv(a, b);
-            case "^": return calculator.power(a, b);
-            case "%": return calculator.modulus(a, b);
-            default: throw new IllegalArgumentException("Неподдерживаемая операция: " + operator);
-        }
-    }
 }
+
 

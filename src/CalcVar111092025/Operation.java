@@ -1,61 +1,85 @@
 package CalcVar211092025;
 
-abstract class Operation {
-    protected int operand1;
-    protected int operand2;
+public interface Operation {
+    int calculate(int a, int b);
+}
 
-    public Operation(int operand1, int operand2) {
-        this.operand1 = operand1;
-        this.operand2 = operand2;
+// Базовый класс для операций с общими методами
+abstract class BaseOperation implements Operation {
+    protected void checkOverflow(long result, String operation) {
+        if (result > Integer.MAX_VALUE || result < Integer.MIN_VALUE) {
+            throw new ArithmeticException("переполнение при " + operation);
+        }
     }
-
-    public abstract int execute();
 }
 
 // Конкретные реализации операций
-class Addition extends Operation {
-    public Addition(int a, int b) { super(a, b); }
-    @Override public int execute() { return operand1 + operand2; }
-}
-
-class Subtraction extends Operation {
-    public Subtraction(int a, int b) { super(a, b); }
-    @Override public int execute() { return operand1 - operand2; }
-}
-
-class Multiplication extends Operation {
-    public Multiplication(int a, int b) { super(a, b); }
-    @Override public int execute() { return operand1 * operand2; }
-}
-
-class Division extends Operation {
-    public Division(int a, int b) { super(a, b); }
-    @Override public int execute() {
-        if (operand2 == 0) throw new ArithmeticException("деление на 0");
-        return operand1 / operand2;
+class Addition extends BaseOperation {
+    @Override
+    public int calculate(int a, int b) {
+        long result = (long) a + (long) b;
+        checkOverflow(result, "сложении");
+        return (int) result;
     }
 }
 
-class IntegerDivision extends Operation {
-    public IntegerDivision(int a, int b) { super(a, b); }
-    @Override public int execute() {
-        if (operand2 == 0) throw new ArithmeticException("целочисленное деление на 0");
-        return operand1 / operand2;
+class Subtraction extends BaseOperation {
+    @Override
+    public int calculate(int a, int b) {
+        long result = (long) a - (long) b;
+        checkOverflow(result, "вычитании");
+        return (int) result;
     }
 }
 
-class Power extends Operation {
-    public Power(int a, int b) { super(a, b); }
-    @Override public int execute() {
-        if (operand2 < 0) throw new ArithmeticException("отрицательная степень не поддерживается");
-        return (int) Math.pow(operand1, operand2);
+class Multiplication extends BaseOperation {
+    @Override
+    public int calculate(int a, int b) {
+        long result = (long) a * (long) b;
+        checkOverflow(result, "умножении");
+        return (int) result;
     }
 }
 
-class Modulus extends Operation {
-    public Modulus(int a, int b) { super(a, b); }
-    @Override public int execute() {
-        if (operand2 == 0) throw new ArithmeticException("остаток от деления на 0");
-        return operand1 % operand2;
+class Division extends BaseOperation {
+    @Override
+    public int calculate(int a, int b) {
+        if (b == 0) {
+            throw new ArithmeticException("деление на ноль невозможно");
+        }
+        if (a == Integer.MIN_VALUE && b == -1) {
+            throw new ArithmeticException("переполнение при делении");
+        }
+        return a / b;
+    }
+}
+
+class Power extends BaseOperation {
+    @Override
+    public int calculate(int a, int b) {
+        if (b < 0) {
+            throw new ArithmeticException("отрицательная степень не поддерживается");
+        }
+        if (b == 0) return 1;
+        if (b > 20) {
+            throw new ArithmeticException("степень слишком велика (максимум 20)");
+        }
+
+        long result = 1;
+        for (int i = 0; i < b; i++) {
+            result *= a;
+            checkOverflow(result, "возведении в степень");
+        }
+        return (int) result;
+    }
+}
+
+class Modulus extends BaseOperation {
+    @Override
+    public int calculate(int a, int b) {
+        if (b == 0) {
+            throw new ArithmeticException("остаток от деления на ноль невозможен");
+        }
+        return a % b;
     }
 }
