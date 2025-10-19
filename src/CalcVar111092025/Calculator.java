@@ -3,85 +3,26 @@ package CalcVar211092025;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Calculator implements IOperationFactory {
-    private final Map<String, IOperation> operations = new HashMap<>();
+public class Calculator {
+    private final Map<String, Operation> operations = new HashMap<>();
 
     public Calculator() {
-        // Регистрация всех операций
-        registerOperation("+", new Addition());
-        registerOperation("-", new Subtraction());
-        registerOperation("*", new Multiplication());
-        registerOperation("/", new Division());
-        registerOperation("//", new Division()); // Используем то же деление (LSP)
-        registerOperation("^", new Power());
-        registerOperation("%", new Modulus());
+        // Используем классы из Operation.java
+        operations.put("+", new Addition());
+        operations.put("-", new Subtraction());
+        operations.put("*", new Multiplication());
+        operations.put("/", new Division());
+        operations.put("//", new Division());
+        operations.put("^", new Power());
+        operations.put("%", new Modulus());
     }
 
-    private void registerOperation(String operator, IOperation operation) {
-        operations.put(operator, operation);
-    }
-
-    @Override
-    public IOperation createOperation(String operator) {
-        IOperation operation = operations.get(operator);
+    public int calculate(int a, String operator, int b) {
+        Operation operation = operations.get(operator);
         if (operation == null) {
-            throw new IllegalArgumentException("Неподдерживаемая операция: " + operator);
+            throw new IllegalArgumentException("неподдерживаемая операция: " + operator);
         }
-        return operation;
+        return operation.calculate(a, b);
     }
-
-    // Публичные методы для обратной совместимости
-    public int sum(int a, int b) { return createOperation("+").execute(a, b); }
-    public int sub(int a, int b) { return createOperation("-").execute(a, b); }
-    public int multiply(int a, int b) { return createOperation("*").execute(a, b); }
-    public int div(int a, int b) { return createOperation("/").execute(a, b); }
-    public int integdiv(int a, int b) { return createOperation("//").execute(a, b); }
-    public int power(int a, int b) { return createOperation("^").execute(a, b); }
-    public int modulus(int a, int b) { return createOperation("%").execute(a, b); }
 }
-/*public class Calculator {
-
-    // Публичные методы для обратной совместимости
-    public int sum(int a, int b) {
-        return createOperation("+", a, b).execute();
-    }
-
-    public int sub(int a, int b) {
-        return createOperation("-", a, b).execute();
-    }
-
-    public int multiply(int a, int b) {
-        return createOperation("*", a, b).execute();
-    }
-
-    public int div(int a, int b) {
-        return createOperation("/", a, b).execute();
-    }
-
-    public int integdiv(int a, int b) {
-        return createOperation("//", a, b).execute();
-    }
-
-    public int power(int a, int b) {
-        return createOperation("^", a, b).execute();
-    }
-
-    public int modulus(int a, int b) {
-        return createOperation("%", a, b).execute();
-    }
-
-    // Приватный метод создания операций (инкапсуляция)
-    private Operation createOperation(String operator, int a, int b) {
-        switch (operator) {
-            case "+": return new Addition(a, b);
-            case "-": return new Subtraction(a, b);
-            case "*": return new Multiplication(a, b);
-            case "/": return new Division(a, b);
-            case "//": return new IntegerDivision(a, b);
-            case "^": return new Power(a, b);
-            case "%": return new Modulus(a, b);
-            default: throw new IllegalArgumentException("Неподдерживаемая операция: " + operator);
-        }
-    }
-}*/
 
